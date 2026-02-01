@@ -133,6 +133,8 @@
   <canvas id="confettiCanvas"></canvas>
 
   <main class="card">
+    <!-- FIRST QUESTION -->
+    <div id="firstQuestion">
     <!-- ANIMAL WITH HEART -->
     <svg class="art" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -189,6 +191,7 @@
         alt="Fireworks"
       />
     </section>
+    </div>
 
     <!-- SECOND QUESTION -->
     <div id="secondQuestion" style="display: none;">
@@ -322,7 +325,7 @@
 
       // Show second question after a delay
       setTimeout(() => {
-        result.style.display = "none";
+        document.getElementById("firstQuestion").style.display = "none";
         document.getElementById("secondQuestion").style.display = "block";
       }, 3000);
     });
