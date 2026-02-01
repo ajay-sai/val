@@ -133,6 +133,8 @@
   <canvas id="confettiCanvas"></canvas>
 
   <main class="card">
+    <!-- FIRST QUESTION -->
+    <div id="firstQuestion">
     <!-- ANIMAL WITH HEART -->
     <svg class="art" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -189,6 +191,28 @@
         alt="Fireworks"
       />
     </section>
+    </div>
+
+    <!-- SECOND QUESTION -->
+    <div id="secondQuestion" style="display: none;">
+      <h1>Did you have fun this 1 year with me?</h1>
+
+      <section class="button-zone" id="zone2">
+        <button id="yesBtn2">Yes</button>
+        <button id="noBtn2">No</button>
+      </section>
+
+      <div class="hint" id="hint2">"No" seems a bit shy again 😈</div>
+
+      <section class="result" id="result2">
+        <h2>YAY! 🎉</h2>
+        <img
+          class="fireworks"
+          src="IMG_20260201_174355-ANIMATION.gif"
+          alt="Celebration"
+        />
+      </section>
+    </div>
   </main>
 
   <script>
@@ -213,12 +237,14 @@
     window.addEventListener("resize", resizeConfettiCanvas);
     window.addEventListener("orientationchange", () => setTimeout(resizeConfettiCanvas, 150));
 
-    const confettiInstance = confetti.create(confettiCanvas, {
+    const confettiInstance = typeof confetti !== 'undefined' ? confetti.create(confettiCanvas, {
       resize: false,
       useWorker: true
-    });
+    }) : null;
 
     function fullScreenConfetti() {
+      if (!confettiInstance) return;
+      
       const end = Date.now() + 1600;
 
       (function frame() {
@@ -294,6 +320,67 @@
       zone.style.display = "none";
       hint.style.display = "none";     // HIDE THE HINT
       result.style.display = "block";
+      resizeConfettiCanvas();
+      fullScreenConfetti();
+
+      // Show second question after a delay
+      setTimeout(() => {
+        document.getElementById("firstQuestion").style.display = "none";
+        document.getElementById("secondQuestion").style.display = "block";
+      }, 3000);
+    });
+
+    /* ---------- SECOND QUESTION LOGIC ---------- */
+    const zone2 = document.getElementById("zone2");
+    const yesBtn2 = document.getElementById("yesBtn2");
+    const noBtn2 = document.getElementById("noBtn2");
+    const result2 = document.getElementById("result2");
+    const hint2 = document.getElementById("hint2");
+
+    let yesScale2 = 1;
+    function growYes2() {
+      yesScale2 = Math.min(2.2, yesScale2 + 0.1);
+      yesBtn2.style.transform = `translateY(-50%) scale(${yesScale2})`;
+    }
+
+    function moveNo2(px, py) {
+      const z = zone2.getBoundingClientRect();
+      const b = noBtn2.getBoundingClientRect();
+
+      let dx = (b.left + b.width / 2) - px;
+      let dy = (b.top + b.height / 2) - py;
+      let mag = Math.hypot(dx, dy) || 1;
+      dx /= mag;
+      dy /= mag;
+
+      let newLeft = (b.left - z.left) + dx * 150;
+      let newTop  = (b.top - z.top) + dy * 150;
+
+      newLeft = clamp(newLeft, 0, z.width - b.width);
+      newTop  = clamp(newTop, 0, z.height - b.height);
+
+      noBtn2.style.left = newLeft + "px";
+      noBtn2.style.top = newTop + "px";
+      noBtn2.style.transform = "none";
+
+      growYes2();
+    }
+
+    zone2.addEventListener("pointermove", e => {
+      const b = noBtn2.getBoundingClientRect();
+      const d = Math.hypot(
+        (b.left + b.width / 2) - e.clientX,
+        (b.top + b.height / 2) - e.clientY
+      );
+      if (d < 140) moveNo2(e.clientX, e.clientY);
+    });
+
+    noBtn2.addEventListener("click", e => e.preventDefault());
+
+    yesBtn2.addEventListener("click", () => {
+      zone2.style.display = "none";
+      hint2.style.display = "none";
+      result2.style.display = "block";
       resizeConfettiCanvas();
       fullScreenConfetti();
     });
